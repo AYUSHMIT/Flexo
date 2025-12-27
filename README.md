@@ -1,47 +1,127 @@
 # Flexo
 
-A new design for microarchitectural weird machines, along with a compiler and a proof-of-concept packer application.
+![Language](https://img.shields.io/badge/Language-C%2B%2B-blue.svg)
+![LLVM](https://img.shields.io/badge/LLVM-17-orange.svg)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+![Platform](https://img.shields.io/badge/Platform-Linux-lightgrey.svg)
+![Build](https://img.shields.io/badge/Build-CMake%20%2B%20Ninja-red.svg)
 
-For more details, please refer to our paper:
+A revolutionary compiler for microarchitectural weird machines - code that computes purely through microarchitectural side effects, providing strong obfuscation against both static and dynamic analysis.
 
-> Ping-Lun Wang, Riccardo Paccagnella, Riad S. Wahby, Fraser Brown.
-> "Bending microarchitectural weird machines towards practicality."
-> USENIX Security, 2024.
+**📚 Quick Links:** [Demo](DEMO.md) | [Quick Start](docs/QUICKSTART.md) | [Examples](docs/EXAMPLES.md) | [Benchmarks](docs/BENCHMARKS.md) | [Architecture](docs/ARCHITECTURE.md)
 
-## Table of contents
+---
 
-- [What are microarchitectural weird machines?](#what-are-microarchitectural-weird-machines)
-- [Hardware requirements](#hardware-requirements)
-- [Reproduce our results](#reproduce-our-results)
-- [Install the Flexo compiler](#install-the-flexo-compiler)
-- [Compile a weird machine](#compile-a-weird-machine)
-- [Example: basic logic gates](#example-basic-logic-gates)
-- [Configure the Flexo compiler](#configure-the-flexo-compiler)
-- [Create a new weird machine with C/C++](#create-a-new-weird-machine-with-cc)
-- [UPFlexo: UPX packer with Flexo weird machines](#upflexo-upx-packer-with-flexo-weird-machines)
-- [Run Flexo on an unsupported processor](#run-flexo-on-an-unsupported-processor)
-- [Contacts](#contacts)
+## 🎯 Features
 
-## What are microarchitectural weird machines?
+- **🔒 Strong Obfuscation**: Resists debuggers, emulators, and static analysis
+- **⚡ Practical Performance**: Microsecond-scale execution for simple circuits
+- **🎨 Flexible Design**: Support for C/C++ and Verilog circuit descriptions
+- **🛡️ Error Detection**: Built-in reliability through dual weird registers
+- **🔧 LLVM Integration**: Seamless integration with LLVM compiler infrastructure
+- **📦 Real-World Application**: UPFlexo packer for binary protection
+- **🔬 Research-Backed**: Published at USENIX Security 2024
+
+---
+
+## 🚀 Interactive Demo
+
+**New!** Try our comprehensive interactive demo:
+
+```bash
+bash demo/interactive-demo.sh
+```
+
+Or explore individual examples:
+- 🔲 Logic Gates: `bash demo/examples/demo-gates.sh`
+- ➕ Arithmetic: `bash demo/examples/demo-arithmetic.sh`
+- 🧮 4-bit ALU: `bash demo/examples/demo-alu.sh`
+- 🔐 Cryptography: `bash demo/examples/demo-crypto.sh`
+- 📦 UPFlexo: `bash demo/examples/demo-upflexo.sh`
+
+---
+
+## 📖 Research & Papers
+
+This work was published at **USENIX Security 2024**:
+
+> Ping-Lun Wang, Riccardo Paccagnella, Riad S. Wahby, Fraser Brown.  
+> **"Bending microarchitectural weird machines towards practicality."**  
+> USENIX Security Symposium, 2024.
+
+**Key Contributions:**
+- Novel weird register designs (Baseline, NoBranch, Dual)
+- Practical LLVM-based compiler implementation
+- Demonstration of complex circuits (AES, SHA-1, Simon)
+- UPFlexo: Real-world packer application
+
+---
+
+---
+
+## 📋 Table of Contents
+
+| Getting Started | Advanced Topics | Reference |
+|----------------|-----------------|-----------|
+| [What are µWMs?](#-what-are-microarchitectural-weird-machines) | [Configure Compiler](#configure-the-flexo-compiler) | [Hardware Requirements](#-hardware-requirements) |
+| [🚀 Quick Start](docs/QUICKSTART.md) | [Create New WM](#create-a-new-weird-machine-with-cc) | [📊 Benchmarks](docs/BENCHMARKS.md) |
+| [Install Compiler](#install-the-flexo-compiler) | [UPFlexo Packer](#upflexo-upx-packer-with-flexo-weird-machines) | [🏗️ Architecture](docs/ARCHITECTURE.md) |
+| [Compile a WM](#compile-a-weird-machine) | [Unsupported Processors](#run-flexo-on-an-unsupported-processor) | [📚 Examples](docs/EXAMPLES.md) |
+| [Basic Gates Example](#example-basic-logic-gates) | [Reproduce Results](#reproduce-our-results) | [Contact](#-contacts) |
+
+---
+
+## 🤔 What are microarchitectural weird machines?
 
 Microarchitectural weird machines (µWMs) are code gadgets that perform computation purely through microarchitectural side effects.
-They work similarly to a binary circuit: they use weird registers to store values and use weird gates to compute with them.
+They work similarly to a binary circuit: they use **weird registers** to store values and use **weird gates** to compute with them.
 
-For example, here is a weird AND gate with two inputs and one output:
+### How It Works
+
+**Traditional Computing:**
+```
+CPU Instruction → ALU → Result in Register
+```
+
+**Weird Machine Computing:**
+```
+Memory Access → Cache Side Effect → Result in Cache State
+```
+
+### Example: AND Gate
+
+Here is a weird AND gate with two inputs and one output:
 
 ```c
 Out[In1[0] + In2[0]]
 ```
 
+**Visualization:**
+```
+Input1 (cached=1) ──┐
+                    ├─→ Access Memory[In1 + In2] ─→ Output (cache state)
+Input2 (cached=1) ──┘
+```
+
 `In1` and `In2` are the two input weird registers, and this AND gate outputs to the weird register `Out`.
 Section 2.2 of our paper explains how a µWM works in details.
-Note: the code snippets in our paper (Listing 1-5) are for illustrative purposes and can be different from our actual implementation, which we show in Listing 7 in the appendix.
 
-These µWMs can prevent both static and dynamic analysis because they convert computations into memory operations (like the AND gate example above), and debuggers and emulators may not preserve the microarchitecture behavior of a processor, e.g., single-stepping stops transient execution.
+> **Note:** The code snippets in our paper (Listing 1-5) are for illustrative purposes and can be different from our actual implementation, which we show in Listing 7 in the appendix.
 
-Therefore, they are a great candidate for program obfuscation and potentially many other types of attacks.
+### Why Are They Powerful?
 
-## Hardware requirements
+These µWMs can prevent both static and dynamic analysis because they convert computations into memory operations:
+
+- 🔍 **Anti-Static Analysis**: No visible computation in the binary
+- 🐛 **Anti-Debug**: Single-stepping breaks transient execution
+- 🖥️ **Anti-Emulation**: Requires real microarchitecture behavior
+- ⏱️ **Side-Channel Based**: Uses cache timing for computation
+
+Therefore, they are a great candidate for program obfuscation and potentially many other security applications.
+
+**Learn More:** See [DEMO.md](DEMO.md) for detailed visualizations and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for technical details.
+
+## 🖥️ Hardware Requirements
 
 The following list is the AWS EC2 instances that we used to run our Flexo weird machines.
 
@@ -261,6 +341,25 @@ I.e., set `WR_OFFSET` to 192, 320, 448, 576, 960, 1088, ...
 Some processors may have smaller transient windows, and thus they can only support small weird gates.
 In this case, reduce `DUAL_WM_MAX_INPUT` to `3` or `2` to reduce the size of weird gates.
 
-## Contacts
+## 💬 Contacts
 
-For any question, contact the first author: Ping-Lun Wang (pinglunw \[at\] andrew \[dot\] cmu \[dot\] edu).
+For any questions or collaboration inquiries:
+
+- **Author**: Ping-Lun Wang
+- **Email**: pinglunw [at] andrew [dot] cmu [dot] edu
+- **Issues**: Open an issue on GitHub
+- **Contributions**: Pull requests welcome!
+
+---
+
+**⭐ Star this repo if you find it useful!**
+
+**🎓 Cite our paper:**
+```bibtex
+@inproceedings{flexo2024,
+  title={Bending microarchitectural weird machines towards practicality},
+  author={Wang, Ping-Lun and Paccagnella, Riccardo and Wahby, Riad S. and Brown, Fraser},
+  booktitle={USENIX Security Symposium},
+  year={2024}
+}
+```
